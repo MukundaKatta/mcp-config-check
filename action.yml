@@ -1,0 +1,41 @@
+name: "mcp-config-check"
+description: "Lint MCP (Model Context Protocol) config files used by Claude Desktop, Cursor, Cline, Windsurf, and Zed."
+author: "Mukunda Katta"
+
+branding:
+  icon: "shield"
+  color: "blue"
+
+inputs:
+  paths:
+    description: "Paths to MCP config JSON files. Multiple space-separated values allowed."
+    required: true
+  quiet:
+    description: "Only print errors (hide OK lines and warnings)."
+    required: false
+    default: "false"
+  python-version:
+    description: "Python version to set up for the action."
+    required: false
+    default: "3.12"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install mcp-config-check
+      shell: bash
+      run: pip install --quiet mcp-config-check
+
+    - name: Run mcp-config-check
+      shell: bash
+      run: |
+        args=""
+        if [ "${{ inputs.quiet }}" = "true" ]; then
+          args="--quiet"
+        fi
+        mcp-config-check $args ${{ inputs.paths }}
