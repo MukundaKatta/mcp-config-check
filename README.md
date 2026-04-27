@@ -80,6 +80,19 @@ if not result.ok:
 | W030 | warning | server container is empty |
 | W900 | warning | unknown field on a server entry |
 
+## Use as a GitHub Action
+
+Add this step to any workflow:
+
+```yaml
+- uses: actions/checkout@v5
+- uses: MukundaKatta/mcp-config-check@v1
+  with:
+    paths: .mcp.json
+```
+
+Pass multiple files space-separated (e.g. `paths: .mcp.json .cursor/mcp.json`). The action runs the same checks as the CLI and fails the workflow on any errors. Inputs: `paths` (required), `quiet` (default `false`), `python-version` (default `3.12`).
+
 ## Development
 
 ```bash
