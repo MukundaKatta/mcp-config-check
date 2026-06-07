@@ -141,7 +141,10 @@ def test_secret_in_args() -> None:
         "mcpServers": {
             "leaky-args": {
                 "command": "curl",
-                "args": ["-H", "Authorization: Bearer ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"],
+                "args": [
+                    "-H",
+                    "Authorization: Bearer ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+                ],
             }
         }
     }
@@ -246,3 +249,33 @@ def test_severity_split_on_result() -> None:
     cfg = {"mcpServers": {"oops": {"args": ["x"]}}}  # missing transport
     result = validate_config_source(json.dumps(cfg))
     assert all(i.severity is Severity.ERROR for i in result.errors)
+
+
+def test_invalid_env_type() -> None:
+    cfg = {"mcpServers": {"bad": {"command": "node", "env": ["not", "a", "dict"]}}}
+    result = validate_config_source(json.dumps(cfg))
+    assert "E006" in _codes(result.errors)
+
+
+def test_invalid_env_value_type() -> None:
+    cfg = {"mcpServers": {"bad": {"command": "node", "env": {"PORT": 8080}}}}
+    result = validate_config_source(json.dumps(cfg))
+    assert "E006" in _codes(result.errors)
+
+
+def test_server_entry_not_object() -> None:
+    cfg = {"mcpServers": {"weird": "just-a-string"}}
+    result = validate_config_source(json.dumps(cfg))
+    assert "E010" in _codes(result.errors)
+
+
+def test_validate_config_file_not_utf8(tmp_path: Path) -> None:
+    p = tmp_path / "binary.json"
+    p.write_bytes(b"\xff\xfe\x00invalid")
+    result = validate_config_file(p)
+    assert "E000" in _codes(result.errors)
+
+
+def test_validate_config_file_directory(tmp_path: Path) -> None:
+    result = validate_config_file(tmp_path)
+    assert "E000" in _codes(result.errors)

@@ -87,7 +87,11 @@ def _check_server(name: str, server: Any) -> list[Issue]:
 
     if not isinstance(server, dict):
         issues.append(
-            _err("E010", f"server entry must be an object, got {type(server).__name__}", name)
+            _err(
+                "E010",
+                f"server entry must be an object, got {type(server).__name__}",
+                name,
+            )
         )
         return issues
 
@@ -96,12 +100,18 @@ def _check_server(name: str, server: Any) -> list[Issue]:
 
     # E001 missingTransport
     if not has_command and not has_url:
-        issues.append(_err("E001", "server has no transport (need 'command' or 'url')", name))
+        issues.append(
+            _err("E001", "server has no transport (need 'command' or 'url')", name)
+        )
 
     # E002 conflictingTransport
     if has_command and has_url:
         issues.append(
-            _err("E002", "server declares both 'command' and 'url'; pick one transport", name)
+            _err(
+                "E002",
+                "server declares both 'command' and 'url'; pick one transport",
+                name,
+            )
         )
 
     # E003 invalidCommand
@@ -179,7 +189,11 @@ def _check_server(name: str, server: Any) -> list[Issue]:
             # E021 urlEmbeddedCredentials
             if parsed.username or parsed.password:
                 issues.append(
-                    _err("E021", "'url' contains embedded credentials; use headers instead", name)
+                    _err(
+                        "E021",
+                        "'url' contains embedded credentials; use headers instead",
+                        name,
+                    )
                 )
             # E022 plaintextHttpWithToken
             if parsed.scheme == "http":
